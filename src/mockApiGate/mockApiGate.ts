@@ -12,6 +12,13 @@ export class MockApiGate implements MockApiGateContract {
   public constructor(dependencies: MockApiGateConstructorData) {
     this.dependencies = dependencies;
   }
+  public toggleDone(params: { todoId: string }): void {
+    const todo = this.dependencies.store.find((el) => el.id === params.todoId);
+    if (todo) {
+      // this.dependency.mockApiGate.patchTodo({ todoId: id, todoBody: { text: todo.text, isDone: !todo.isDone } });
+      todo.isDone = !todo.isDone;
+    }
+  }
 
   public fetchTodoList(params: { todoStatus: TodoStatusContract }): TodoContract[] {
     return this.dependencies.store.filter((todo) => {

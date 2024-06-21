@@ -11,11 +11,14 @@ interface TodoListDependency {
 class TodoList {
   private WRAPPER_ID = 'todo-list-wrapper';
   private LIST_ID = 'todo-list';
-  private FILTERS_ID = 'filters-id';
+  private FILTERS_ID = 'filters';
   private FILTERS_BTN = 'filters-filters-btn';
   private CHANGE_IS_DONE_BTN = 'change-is-done-btn';
+  private DELETE_BTN = 'delete-btn';
   private DATA_ATTR_CLK_EL_BTN = 'data-clk-el-btn';
   private DATA_ATTR_ID = 'data-id';
+  private ADD_FORM_ID = 'add-form';
+  private ADD_FORM_INPUT_ID = 'add-form-input';
   private dependency: TodoListDependency;
   private todoStatus: TodoStatusContract = TodoStatusContract.ALL;
 
@@ -33,6 +36,9 @@ class TodoList {
     if (dataBtn === this.FILTERS_BTN && id !== null) {
       this.changeTodoStatus(id as TodoStatusContract);
     }
+    if (dataBtn === this.DELETE_BTN && id !== null) {
+      this.deleteTodo(id);
+    }
   };
 
   private changeTodoStatus(todoStatus: TodoStatusContract) {
@@ -42,19 +48,38 @@ class TodoList {
   }
 
   private changeIsDoneStatus(id: EntityIdContract) {
-    const todo = this.dependency.mockApiGate.fetchTodoList({ todoStatus: this.todoStatus }).find((el) => el.id === id);
-    if (todo) {
-      this.dependency.mockApiGate.patchTodo({ todoId: id, todoBody: { text: todo.text, isDone: !todo.isDone } });
-      this.todoListRender();
-    }
+    this.dependency.mockApiGate.toggleDone({ todoId: id });
+    this.todoListRender();
   }
+
+  private deleteTodo(id: EntityIdContract) {
+    this.dependency.mockApiGate.deleteTodo({ todoId: id });
+    this.todoListRender();
+  }
+
+  private addFormSubmit = (e: SubmitEvent) => {
+    e.preventDefault();
+    const input = document.getElementById(this.ADD_FORM_INPUT_ID);
+    if (input) {
+      const value = (input as HTMLInputElement).value.trim();
+      if (value.length > 0) {
+        this.dependency.mockApiGate.addTodo({ todoBody: { isDone: false, text: value } });
+        this.todoListRender();
+        (input as HTMLInputElement).value = '';
+      }
+    }
+  };
 
   private wrapperRender() {
     mount(
       'body',
       ` 
         <div class="todo_list_widget" id=${this.WRAPPER_ID}>
-          <div class="filters" id="${this.FILTERS_ID}">123123</div>
+          <div class="filters" id="${this.FILTERS_ID}"></div>
+          <form class="add-form" id=${this.ADD_FORM_ID} autocomplete="off">
+            <input placeholder="Введите текст" id="${this.ADD_FORM_INPUT_ID}" autocomplete="off" />
+            <button type="submit"></button>
+          </form>
           <ul class="todo-list" id="${this.LIST_ID}"></ul>
         </div>
       `,
@@ -62,6 +87,10 @@ class TodoList {
     const wrapper = document.getElementById(this.WRAPPER_ID);
     if (wrapper) {
       wrapper.addEventListener('click', this.onClick);
+    }
+    const addForm = document.getElementById(this.ADD_FORM_ID);
+    if (addForm) {
+      addForm.addEventListener('submit', this.addFormSubmit);
     }
   }
 
@@ -94,11 +123,13 @@ class TodoList {
       }
 
       for (const todo of todoList) {
-        const btnClass = 'check-btn ' + (todo.isDone ? 'complete' : '');
+        const checkBtnClass = 'check-btn ' + (todo.isDone ? 'complete' : '');
         const txtClass = 'txt ' + (todo.isDone ? 'complete' : '');
+        const deleteBtnClass = 'delete-btn';
         const todoItem = `
-          <button class="${btnClass}" ${this.DATA_ATTR_ID}=${todo.id} ${this.DATA_ATTR_CLK_EL_BTN}="${this.CHANGE_IS_DONE_BTN}">${todo.isDone ? 'X' : ''}</button>
+          <button class="${checkBtnClass}" ${this.DATA_ATTR_ID}=${todo.id} ${this.DATA_ATTR_CLK_EL_BTN}="${this.CHANGE_IS_DONE_BTN}">${todo.isDone ? 'X' : ''}</button>
           <div class="${txtClass}">${todo.text}</div>
+          <button class="${deleteBtnClass}" ${this.DATA_ATTR_ID}=${todo.id} ${this.DATA_ATTR_CLK_EL_BTN}="${this.DELETE_BTN}">X</button>
         `;
         const child = document.createElement('ul');
         child.className = 'todo-item_wrapper';

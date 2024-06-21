@@ -20,6 +20,7 @@ export interface MockApiGateContract {
   addTodo(params: { todoBody: TodoBodyContract }): EntityIdContract;
   patchTodo(params: { todoId: EntityIdContract; todoBody: TodoBodyContract }): void;
   deleteTodo(params: { todoId: EntityIdContract }): void;
+  toggleDone(params: { todoId: EntityIdContract }): void;
   clearCompleted(): void;
 }
 
