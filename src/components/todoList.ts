@@ -136,6 +136,12 @@ class TodoList {
         child.innerHTML = todoItem;
         wrapper.appendChild(child);
       }
+
+      if (todoList.length === 0) {
+        const child = document.createElement('ul');
+        child.innerText = 'Ничего не найдено';
+        wrapper.appendChild(child);
+      }
     }
   }
 
