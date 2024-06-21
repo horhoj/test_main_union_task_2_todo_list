@@ -1,8 +1,10 @@
-# Туду лист с бесконечной вложенностью списков туду. С тестами и полноценной эмуляцией слоя АПИ
+# Туду лист на JS БЕЗ ФРЭЙМВОРКОВ
+
+ДЕМО: https://test-main-union-task-2-todo-list.vercel.app/
 
 # Используется: 
 
-vite, react, typescript, redux-tookit, docker(docker-compose), nginx (для раздачи статики билда), eslint + prettier
+vite, typescript, docker(docker-compose), nginx (для раздачи статики билда), eslint + prettier
 
 # запуск
 
@@ -10,9 +12,6 @@ npm i
 
 npm run dev
 
-# тесты
-
-npm run test
 
 # запуск в докере (протестировано только на линукс, нужны make, docker, docker-compose)
 
